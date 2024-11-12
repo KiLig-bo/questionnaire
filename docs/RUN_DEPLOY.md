@@ -1,73 +1,76 @@
-# 项目运行与部署
+# Project Setup and Deployment
 
-## 1.准备数据库
-1. 确保安装并启动了MySQL或者MariaDB数据库服务.
-2. 创建数据库questionnaire
+## 1. Prepare the Database
+1. Ensure that MySQL or MariaDB database service is installed and running.
+2. Create the `questionnaire` database:
    ```mysql
-    CREATE DATABASE IF NOT EXISTS `questionnaire` DEFAULT CHARACTER SET utf8mb4;
+   CREATE DATABASE IF NOT EXISTS `questionnaire` DEFAULT CHARACTER SET utf8mb4;
    ```
-3. 导入questionnaire-schema.sql（表结构定义）。
-   + 使用mysqlimport命令
-   ```bash
-   mysqlimport.exe -uroot -p questionnaire your_path/questionnaire-schema.sql
-   ```
-   + 或者进入mysql命令行
-   ```mysql
-    use questionnaire;
-    source your_absoult_path/questionnaire-schema.sql
-   ```
-4. 导入questionnaire-data.sql（测试数据）
-   + 使用mysqlimport命令
-   ```bash
-   mysqlimport.exe -uroot -p questionnaire your_path/questionnaire-data.sql
-   ```
-   + 或者进入mysql命令行
-   ```mysql
-    use questionnaire;
-    source your_absoult_path/questionnaire-data.sql
-   ```
-## 2.准备ElasticSearch
- > ElasticSearch版本为7.6.2 
-1. 安装ElasticSearch <br>
-   + 本地安装 <br>
-   选择合适的包，windows选zip或者msi，linux选tar.gz。<br>
-   [ElasticSearch下载](https://repo.huaweicloud.com/elasticsearch/7.6.2/)
-   + Docker安装<br>
+3. Import `questionnaire-schema.sql` (table structure definition).
+   + Using the `mysqlimport` command:
+     ```bash
+     mysqlimport.exe -uroot -p questionnaire your_path/questionnaire-schema.sql
+     ```
+   + Alternatively, from within the MySQL command line:
+     ```mysql
+     USE questionnaire;
+     SOURCE your_absolute_path/questionnaire-schema.sql;
+     ```
+4. Import `questionnaire-data.sql` (test data).
+   + Using the `mysqlimport` command:
+     ```bash
+     mysqlimport.exe -uroot -p questionnaire your_path/questionnaire-data.sql
+     ```
+   + Or from within the MySQL command line:
+     ```mysql
+     USE questionnaire;
+     SOURCE your_absolute_path/questionnaire-data.sql;
+     ```
+
+## 2. Prepare ElasticSearch
+> Required ElasticSearch version: 7.6.2 
+
+1. Install ElasticSearch  
+   + **Local installation**:  
+     Choose the appropriate package (e.g., zip or msi for Windows, tar.gz for Linux).  
+     [ElasticSearch Download](https://repo.huaweicloud.com/elasticsearch/7.6.2/)
+   + **Docker installation**:
      ```bash
      docker pull elasticsearch:7.6.2
      ```
-2. 安装ElasticSearch分词插件IK <br>
-   进入elasticsearch的bin目录，执行如下命令直接安装：
+
+2. Install the IK Analyzer Plugin for ElasticSearch  
+   In the `bin` directory of ElasticSearch, install the plugin directly by running:
    ```bash
    ./elasticsearch-plugin install https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v7.6.2/elasticsearch-analysis-ik-7.6.2.zip
    ```
-   或者先下载到本地再安装：<br>
-   [ik下载地址](https://github.com/medcl/elasticsearch-analysis-ik/releases)
-   选择v7.6.2。然后执行命令：
+   Or, download it locally first:
+   [IK Download](https://github.com/medcl/elasticsearch-analysis-ik/releases) (choose version 7.6.2). Then install with:
    ```bash
    ./elasticsearch-plugin install file:///{your_path}/elasticsearch-analysis-ik-7.6.2.zip
    ```
-3. 启动ElasticSearch <br>
-   进入bin/目录，执行：
+
+3. Start ElasticSearch  
+   In the `bin` directory, run:
    ```bash
    ./elasticsearch
    ```
-   验证是否启动成功：
+   Verify if ElasticSearch started successfully:
    ```bash
    curl "http://{your_ip}:9200/_cat"
    ```
 
-## 3. 配置项目
-1. 首先导入项目到IDE，推荐IDEA
-2. 修改配置 <br>
-   根据你的环境和需要在application-<profile>.properties修改数据库连接配置、Elasticsearch连接配置、邮件配置等配置项。
-3. 导入数据到ElasticSearch <br>
-   直接执行src/test/java/com/gyb/questionnaire/ESTemplateSearchTest.java的indexTemplateToES测试方法，将数据库中的数据导入到Elasticsearch。
-   
-## 4. 启动项目
- 进入项目根目录执行：
- ```bash
-  ./mvnw spring-boot:run
- ```
- 或者在IDEA中，右键执行QuestionnaireApplication <br>
- 在浏览器中输入http://localhost:8080,进入主页面。
+## 3. Project Configuration
+1. Import the project into your IDE (recommended: IntelliJ IDEA).
+2. Update the configuration:  
+   Adjust settings in `application-<profile>.properties` to configure database connections, ElasticSearch connection, email settings, and other necessary configurations based on your environment.
+3. Import data into ElasticSearch:  
+   Run the `indexTemplateToES` test method in `src/test/java/com/gyb/questionnaire/ESTemplateSearchTest.java` to load data from the database into ElasticSearch.
+
+## 4. Start the Project
+In the project root directory, execute:
+```bash
+./mvnw spring-boot:run
+```
+Alternatively, in IntelliJ IDEA, right-click and run `QuestionnaireApplication`.  
+In your browser, go to [http://localhost:8080](http://localhost:8080) to access the main page.
