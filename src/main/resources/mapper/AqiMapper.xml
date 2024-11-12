@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mgcx.nepm.mapper.AqiMapper">
+
+    <resultMap id="BaseResultMap" type="org.mgcx.nepm.entity.Aqi">
+            <id property="aqiId" column="aqi_id" jdbcType="INTEGER"/>
+            <result property="level" column="level" jdbcType="VARCHAR"/>
+            <result property="chineseExplain" column="chinese_explain" jdbcType="VARCHAR"/>
+            <result property="aqiExplain" column="aqi_explain" jdbcType="VARCHAR"/>
+            <result property="color" column="color" jdbcType="VARCHAR"/>
+            <result property="healthImpact" column="health_impact" jdbcType="VARCHAR"/>
+            <result property="takeSteps" column="take_steps" jdbcType="VARCHAR"/>
+            <result property="so2Min" column="so2_min" jdbcType="INTEGER"/>
+            <result property="so2Max" column="so2_max" jdbcType="INTEGER"/>
+            <result property="coMin" column="co_min" jdbcType="INTEGER"/>
+            <result property="coMax" column="co_max" jdbcType="INTEGER"/>
+            <result property="spmMin" column="spm_min" jdbcType="INTEGER"/>
+            <result property="spmMax" column="spm_max" jdbcType="INTEGER"/>
+            <result property="remarks" column="remarks" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+        aqi_id,level,chinese_explain,aqi_explain,
+        color,health_impact,take_steps,
+        so2_min,so2_max,co_min,
+        co_max,spm_min,spm_max,
+        remarks
+    </sql>
+    <select id="getAqiById" parameterType="org.mgcx.nepm.entity.Aqi" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM aqi
+        WHERE aqi_id = #{aqiId}
+    </select>
+    <select id="listAqi" parameterType="org.mgcx.nepm.entity.Aqi" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM aqi
+        <!-- Additional conditions can be added here if needed -->
+    </select>
+
+    <select id="getAqiByAqiId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM aqi
+        WHERE aqi_id = #{aqiId}
+    </select>
+</mapper>

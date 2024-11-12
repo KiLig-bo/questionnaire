@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mgcx.nepm.mapper.GridDistrictMapper">
+
+    <resultMap id="BaseResultMap" type="org.mgcx.nepm.entity.GridDistrict">
+        <id property="districtId" column="district_id" jdbcType="INTEGER"/>
+        <result property="districtName" column="district_name" jdbcType="VARCHAR"/>
+        <result property="cityId" column="city_id" jdbcType="INTEGER"/>
+        <result property="remarks" column="remarks" jdbcType="VARCHAR"/>
+        <result property="districtId" column="district_id" jdbcType="INTEGER"/>
+
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        district_id,district_name,city_id,
+        remarks
+    </sql>
+
+
+    <!-- 根据城市ID获取GridDistrict -->
+    <select id="getGridDistrictByDistrictId" parameterType="org.mgcx.nepm.entity.GridDistrict" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM grid_district
+        WHERE district_id = #{districtId}
+    </select>
+
+    <!-- 根据城市名称获取GridDistrict -->
+    <select id="getGridDistrictByDistrictName" parameterType="org.mgcx.nepm.entity.GridDistrict" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM grid_district
+        WHERE district_name = #{districtName}
+    </select>
+
+    <!-- 根据省ID获取GridDistrict -->
+    <select id="getGridDistrictByCityId" parameterType="org.mgcx.nepm.entity.GridDistrict" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM grid_district
+        WHERE city_id = #{cityId}
+    </select>
+
+    <!-- 列出所有GridDistrict -->
+    <select id="listGridDistrict" parameterType="org.mgcx.nepm.entity.GridDistrict" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM grid_district
+        <!-- Additional conditions can be added here if needed -->
+    </select>
+
+    <select id="getGridDistrictById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM grid_district
+        WHERE district_id = #{districtId}
+    </select>
+    <select id="getAllDistrictByCityId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM grid_district
+        WHERE city_id = #{cityId}
+    </select>
+
+</mapper>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mgcx.nepm.mapper.GridProvinceMapper">
+
+    <resultMap id="BaseResultMap" type="org.mgcx.nepm.entity.GridProvince">
+            <id property="provinceId" column="province_id" jdbcType="INTEGER"/>
+            <result property="provinceName" column="province_name" jdbcType="VARCHAR"/>
+            <result property="provinceAbbr" column="province_abbr" jdbcType="VARCHAR"/>
+            <result property="remarks" column="remarks" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="getAllCollection" type="org.mgcx.nepm.entity.GridProvince">
+        <id property="provinceId" column="province_id" jdbcType="INTEGER"/>
+        <result property="provinceId" column="province_id" jdbcType="INTEGER"/>
+        <result property="provinceName" column="province_name" jdbcType="VARCHAR"/>
+        <collection property="children" ofType="org.mgcx.nepm.entity.GridCity"
+                    select="org.mgcx.nepm.mapper.GridCityMapper.getAllCityByProvinceId"
+                    column="province_id">
+        </collection>
+    </resultMap>
+    <resultMap id="ProvinceResultMap" type="org.mgcx.nepm.entity.GridProvince">
+        <id property="provinceId" column="province_id" jdbcType="INTEGER"/>
+        <result property="provinceName" column="province_name" jdbcType="VARCHAR"/>
+        <result property="provinceId" column="province_id" jdbcType="INTEGER"/>
+        <collection property="children" ofType="org.mgcx.nepm.entity.GridCity">
+            <id property="cityId" column="city_id" jdbcType="INTEGER"/>
+            <result property="cityName" column="city_name" jdbcType="VARCHAR"/>
+            <result property="cityId" column="city_id" jdbcType="INTEGER"/>
+            <collection property="children" ofType="org.mgcx.nepm.entity.GridDistrict">
+                <id property="districtId" column="district_id" jdbcType="INTEGER"/>
+                <result property="districtName" column="district_name" jdbcType="VARCHAR"/>
+                <result property="districtId" column="district_id" jdbcType="INTEGER"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        province_id,province_name,province_abbr,
+        remarks
+    </sql>
+
+    <!-- 获取指定ID的GridProvince -->
+    <select id="getGridProvinceById" parameterType="org.mgcx.nepm.entity.GridProvince" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM grid_province
+        WHERE province_id = #{provinceId}
+    </select>
+
+    <!-- 保存GridProvince -->
+    <insert id="saveGridProvince" parameterType="org.mgcx.nepm.entity.GridProvince">
+        INSERT INTO grid_province (province_id, province_name, province_abbr, remarks)
+        VALUES (#{provinceId}, #{provinceName}, #{provinceAbbr}, #{remarks})
+    </insert>
+
+    <!-- 更新GridProvince -->
+    <update id="updateGridProvince" parameterType="org.mgcx.nepm.entity.GridProvince">
+        UPDATE grid_province
+        SET province_name = #{provinceName},
+            province_abbr = #{provinceAbbr},
+            remarks = #{remarks}
+        WHERE province_id = #{provinceId}
+    </update>
+
+    <!-- 通过名称获取GridProvince -->
+    <select id="getGridProvinceByName" parameterType="org.mgcx.nepm.entity.GridProvince" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM grid_province
+        WHERE province_name = #{provinceName}
+    </select>
+
+    <!-- 通过缩写获取GridProvince -->
+    <select id="getGridProvinceByAbbr" parameterType="org.mgcx.nepm.entity.GridProvince" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM grid_province
+        WHERE province_abbr = #{provinceAbbr}
+    </select>
+
+    <!-- 列出所有GridProvince -->
+    <select id="listGridProvince" parameterType="org.mgcx.nepm.entity.GridProvince" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM grid_province
+    </select>
+
+    <select id="getGridProvinceByProvinceId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM grid_province
+        WHERE province_id = #{provinceId}
+    </select>
+
+    <select id="getAllGridProvince" resultMap="ProvinceResultMap">
+        SELECT
+            p.province_id, p.province_name,
+            c.city_id, c.city_name, c.province_id,
+            d.district_id, d.district_name, d.city_id
+        FROM
+            grid_province p
+                LEFT JOIN
+            grid_city c ON p.province_id = c.province_id
+                LEFT JOIN
+            grid_district d ON c.city_id = d.city_id
+    </select>
+    <select id="getAllProvince" resultType="org.mgcx.nepm.entity.GridProvince">
+        select <include refid="Base_Column_List"/>
+        from grid_province
+    </select>
+
+</mapper>

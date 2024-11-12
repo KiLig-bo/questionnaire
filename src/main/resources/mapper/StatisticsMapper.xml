@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mgcx.nepm.mapper.StatisticsMapper">
+
+    <resultMap id="BaseResultMap" type="org.mgcx.nepm.entity.Statistics">
+            <id property="sId" column="s_id" jdbcType="INTEGER"/>
+            <result property="provinceId" column="province_id" jdbcType="INTEGER"/>
+            <result property="cityId" column="city_id" jdbcType="INTEGER"/>
+            <result property="districtId" column="district_id" jdbcType="INTEGER"/>
+            <result property="address" column="address" jdbcType="VARCHAR"/>
+            <result property="so2Value" column="so2_value" jdbcType="INTEGER"/>
+            <result property="so2Level" column="so2_level" jdbcType="INTEGER"/>
+            <result property="coValue" column="co_value" jdbcType="INTEGER"/>
+            <result property="coLevel" column="co_level" jdbcType="INTEGER"/>
+            <result property="spmValue" column="spm_value" jdbcType="INTEGER"/>
+            <result property="spmLevel" column="spm_level" jdbcType="INTEGER"/>
+            <result property="aqiId" column="aqi_id" jdbcType="INTEGER"/>
+            <result property="confirmTimestamp" column="confirm_timestamp" jdbcType="TIMESTAMP"/>
+            <result property="gmId" column="gm_id" jdbcType="VARCHAR"/>
+            <result property="fdId" column="fd_id" jdbcType="VARCHAR"/>
+            <result property="information" column="information" jdbcType="VARCHAR"/>
+            <result property="remarks" column="remarks" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        s_id,province_id,city_id,district_id,
+        address,so2_value,so2_level,
+        co_value,co_level,spm_value,
+        spm_level,aqi_id,confirm_timestamp,
+        gm_id,fd_id,information,
+        remarks
+    </sql>
+    <resultMap id="AllStatsData" type="org.mgcx.nepm.entity.Statistics">
+        <id property="sId" column="s_id" jdbcType="INTEGER"/>
+        <result property="gmId" column="gm_id" jdbcType="VARCHAR"/>
+        <association property="province" javaType="org.mgcx.nepm.entity.GridProvince"
+                     select="org.mgcx.nepm.mapper.GridProvinceMapper.getGridProvinceByProvinceId"
+                     column="province_id">
+            <result property="provinceId" column="province_id" jdbcType="INTEGER"/>
+            <result property="provinceName" column="province_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="city" javaType="org.mgcx.nepm.entity.GridCity"
+                     select="org.mgcx.nepm.mapper.GridCityMapper.getGridCityById"
+                     column="city_id">
+            <result property="cityId" column="city_id" jdbcType="INTEGER"/>
+            <result property="cityName" column="city_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="district" javaType="org.mgcx.nepm.entity.GridDistrict"
+                     select="org.mgcx.nepm.mapper.GridDistrictMapper.getGridDistrictById"
+                     column="district_id">
+            <result property="districtId" column="district_id" jdbcType="INTEGER"/>
+            <result property="districtName" column="district_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="aqi" javaType="org.mgcx.nepm.entity.Aqi"
+                     select="org.mgcx.nepm.mapper.AqiMapper.getAqiByAqiId"
+                     column="aqi_id">
+            <result property="level" column="level" jdbcType="VARCHAR"/>
+            <result property="chineseExplain" column="chinese_explain" jdbcType="VARCHAR"/>
+            <result property="aqiExplain" column="aqi_explain" jdbcType="VARCHAR"/>
+            <result property="color" column="color" jdbcType="VARCHAR"/>
+        </association>
+        <association property="gridManager"
+                     javaType="org.mgcx.nepm.entity.User"
+                     select="org.mgcx.nepm.mapper.UserMapper.getUserByUserId"
+                     column="gm_id">
+        </association>
+        <association property="feedbacker"
+                     javaType="org.mgcx.nepm.entity.User"
+                     select="org.mgcx.nepm.mapper.UserMapper.getUserByUserId"
+                     column="fd_id">
+        </association>
+    </resultMap>
+
+
+    <!-- Insert a new Statistics record -->
+    <insert id="saveStatistics" parameterType="org.mgcx.nepm.entity.Statistics" useGeneratedKeys="true" keyProperty="sId">
+        INSERT INTO statistics (province_id, city_id, district_id,address, so2_value, so2_level, co_value, co_level, spm_value, spm_level, aqi_id, confirm_timestamp, gm_id, fd_id, information, remarks)
+        VALUES (#{provinceId}, #{cityId}, #{districtId}, #{address}, #{so2Value}, #{so2Level}, #{coValue}, #{coLevel}, #{spmValue}, #{spmLevel}, #{aqiId}, #{confirmTimestamp}, #{gmId}, #{fdId}, #{information}, #{remarks})
+    </insert>
+
+    <!-- Query for list of Statistics with pagination and filtering -->
+    <select id="listStatistics" parameterType="org.mgcx.nepm.entity.Statistics" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM statistics
+    </select>
+
+    <!-- Select a Statistics record by ID -->
+    <select id="getStatisticsById" parameterType="org.mgcx.nepm.entity.Statistics" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM statistics
+        WHERE s_id = #{sId}
+    </select>
+    <select id="getConfirmedStatsData" resultMap="AllStatsData">
+        select <include refid="Base_Column_List"/>
+        from statistics
+    </select>
+    <select id="getStatsById" resultMap="AllStatsData">
+        select * from statistics where s_id = #{sId}
+    </select>
+
+    <!-- Update an existing Statistics record -->
+    <update id="modifyStatistics" parameterType="org.mgcx.nepm.entity.Statistics">
+        UPDATE statistics
+        <set>
+            <if test="sId != null">s_id = #{sId},</if>
+            <if test="provinceId != null">province_id = #{provinceId},</if>
+            <if test="cityId != null">city_id = #{cityId},</if>
+            <if test="districtId != null">district_id = #{districtId},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="so2Value != null">so2_value = #{so2Value},</if>
+            <if test="so2Level != null">so2_level = #{so2Level},</if>
+            <if test="coValue != null">co_value = #{coValue},</if>
+            <if test="coLevel != null">co_level = #{coLevel},</if>
+            <if test="spmValue != null">spm_value = #{spmValue},</if>
+            <if test="spmLevel != null">spm_level = #{spmLevel},</if>
+            <if test="aqiId != null">aqi_id = #{aqiId},</if>
+            <if test="confirmTimestamp != null">confirm_timestamp = #{confirmTimestamp},</if>
+            <if test="gmId != null">gm_id = #{gmId},</if>
+            <if test="fdId != null">fd_id = #{fdId},</if>
+            <if test="information != null">information = #{information},</if>
+            <if test="remarks != null">remarks = #{remarks}</if>
+        </set>
+        WHERE s_id = #{sId}
+    </update>
+
+
+    <resultMap id="confirmedStatsSearchResult" type="org.mgcx.nepm.entity.Statistics" extends="BaseResultMap">
+        <id property="sId" column="s_id" jdbcType="INTEGER"/>
+        <result property="gmId" column="gm_id" jdbcType="VARCHAR"/>
+        <result property="confirmTimestamp" column="confirm_timestamp" jdbcType="TIMESTAMP"/>
+        <association property="province" javaType="org.mgcx.nepm.entity.GridProvince"
+                     select="org.mgcx.nepm.mapper.GridProvinceMapper.getGridProvinceByProvinceId"
+                     column="province_id">
+            <result property="provinceId" column="province_id" jdbcType="INTEGER"/>
+            <result property="provinceName" column="province_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="city" javaType="org.mgcx.nepm.entity.GridCity"
+                     select="org.mgcx.nepm.mapper.GridCityMapper.getGridCityById"
+                     column="city_id">
+            <result property="cityId" column="city_id" jdbcType="INTEGER"/>
+            <result property="cityName" column="city_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="district" javaType="org.mgcx.nepm.entity.GridDistrict"
+                     select="org.mgcx.nepm.mapper.GridDistrictMapper.getGridDistrictById"
+                     column="district_id">
+            <result property="districtId" column="district_id" jdbcType="INTEGER"/>
+            <result property="districtName" column="district_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="aqi" javaType="org.mgcx.nepm.entity.Aqi"
+                     select="org.mgcx.nepm.mapper.AqiMapper.getAqiByAqiId"
+                     column="aqi_id">
+            <result property="aqiId" column="aqi_id" jdbcType="INTEGER"/>
+            <result property="level" column="level" jdbcType="VARCHAR"/>
+            <result property="color" column="color" jdbcType="VARCHAR"/>
+        </association>
+        <association property="gridManager"
+                     javaType="org.mgcx.nepm.entity.User"
+                     select="org.mgcx.nepm.mapper.UserMapper.getUserByUserId"
+                     column="gm_id">
+        </association>
+        <association property="feedbacker"
+                     javaType="org.mgcx.nepm.entity.User"
+                     select="org.mgcx.nepm.mapper.UserMapper.getUserByUserId"
+                     column="fd_id">
+        </association>
+    </resultMap>
+
+    <!-- 联合模糊查询 -->
+    <select id="confirmedStatsSearch" parameterType="org.mgcx.nepm.entity.Statistics" resultMap="confirmedStatsSearchResult">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM statistics
+        WHERE 1=1
+        <if test="sId != null">
+            AND s_id = #{sId}
+        </if>
+        <if test="provinceId != null">
+            AND province_id = #{provinceId}
+        </if>
+        <if test="cityId != null">
+            AND city_id = #{cityId}
+        </if>
+        <if test="districtId != null">
+            AND district_id = #{districtId}
+        </if>
+        <if test="address != null and address.trim() != ''">
+            AND address LIKE CONCAT('%', #{address}, '%')
+        </if>
+        <if test="so2Value != null">
+            AND so2_value = #{so2Value}
+        </if>
+        <if test="so2Level != null">
+            AND so2_level = #{so2Level}
+        </if>
+        <if test="coValue != null">
+            AND co_value = #{coValue}
+        </if>
+        <if test="coLevel != null">
+            AND co_level = #{coLevel}
+        </if>
+        <if test="spmValue != null">
+            AND spm_value = #{spmValue}
+        </if>
+        <if test="spmLevel != null">
+            AND spm_level = #{spmLevel}
+        </if>
+        <if test="aqiId != null">
+            AND aqi_id = #{aqiId}
+        </if>
+        <!-- 注意：对于 TIMESTAMP 字段，通常不需要模糊查询 -->
+        <if test="confirmTimestamp != null">
+            AND confirm_timestamp = #{confirmTimestamp}
+        </if>
+        <if test="gmId != null and gmId.trim() != ''">
+            AND gm_id LIKE CONCAT('%', #{gmId}, '%')
+        </if>
+        <if test="fdId != null and fdId.trim() != ''">
+            AND fd_id LIKE CONCAT('%', #{fdId}, '%')
+        </if>
+        <if test="information != null and information.trim() != ''">
+            AND information LIKE CONCAT('%', #{information}, '%')
+        </if>
+        <if test="remarks != null and remarks.trim() != ''">
+            AND remarks LIKE CONCAT('%', #{remarks}, '%')
+        </if>
+    </select>
+
+</mapper>

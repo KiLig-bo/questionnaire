@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mgcx.nepm.mapper.UserMapper">
+
+    <!-- 定义resultMap -->
+    <resultMap id="BaseResultMap" type="org.mgcx.nepm.entity.User">
+        <id property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="role" column="role" jdbcType="INTEGER"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="realName" column="real_name" jdbcType="VARCHAR"/>
+        <result property="birthday" column="birthday" jdbcType="VARCHAR"/>
+        <result property="sex" column="sex" jdbcType="INTEGER"/>
+        <result property="tel" column="tel" jdbcType="VARCHAR"/>
+        <result property="gridProvinceId" column="grid_province_id" jdbcType="INTEGER"/>
+        <result property="gridCityId" column="grid_city_id" jdbcType="INTEGER"/>
+        <result property="gridDistrictId" column="grid_district_id" jdbcType="INTEGER"/>
+        <result property="state" column="state" jdbcType="INTEGER"/>
+        <result property="remarks" column="remarks" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 定义列名常量 -->
+    <sql id="Base_Column_List">
+        user_id, role, username, password, real_name, birthday, sex, tel, grid_province_id, grid_city_id,grid_district_id, state, remarks
+    </sql>
+
+    <!-- 自定义插入语句 -->
+    <insert id="insert" parameterType="org.mgcx.nepm.entity.User">
+        insert into user
+        (user_id, role, username, password, real_name, birthday, sex, tel, grid_province_id, grid_city_id,grid_district_id, state, remarks)
+        values
+            (#{userId}, #{role}, #{username}, #{password}, #{realName}, #{birthday}, #{sex}, #{tel}, #{gridProvinceId}, #{gridCityId}, #{gridDistrictId}, #{state}, #{remarks})
+    </insert>
+
+    <select id="listGridMemberByProvinceId" parameterType="org.mgcx.nepm.entity.User" resultType="org.mgcx.nepm.entity.User">
+        SELECT <include refid="Base_Column_List"/> FROM user WHERE grid_province_id = #{gridProvinceId}
+    </select>
+
+
+
+    <select id="getUserById" parameterType="org.mgcx.nepm.entity.User" resultType="org.mgcx.nepm.entity.User">
+        SELECT <include refid="Base_Column_List"/> FROM user WHERE user_id = #{userId}
+    </select>
+
+    <insert id="saveUser" parameterType="org.mgcx.nepm.entity.User">
+        insert into user (user_id, role, username, password, real_name, birthday, sex, tel, grid_province_id, grid_city_id,grid_district_id, state, remarks)
+        values (#{userId}, #{role}, #{username}, #{password}, #{realName}, #{birthday}, #{sex}, #{tel}, #{gridProvinceId}, #{gridCityId}, #{gridDistrictId}, #{state}, #{remarks})
+    </insert>
+
+    <insert id="insertAdmin">
+            INSERT INTO user
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="state != null ">state,</if>
+                <if test="username != null and username != ''">username,</if>
+                <if test="password != null and password != ''">password,</if>
+                <if test="tel != null and tel != ''">tel,</if>
+                <if test="realName != null and realName != ''">real_name,</if>
+                <if test="userId != null and userId != ''">user_id,</if>
+                <if test="role != null ">role,</if>
+                <if test="gridProvinceId != null ">grid_province_id,</if>
+                <if test="gridCityId != null ">grid_city_id,</if>
+                <if test="gridDistrictId != null ">grid_district_id,</if>
+                <if test="remarks != null and remarks != ''">remarks,</if>
+                <if test="sex != null ">sex,</if>
+            </trim>
+            <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+                <if test="state != null ">#{state},</if>
+                <if test="username != null and username != ''">#{username},</if>
+                <if test="password != null and password != ''">#{password},</if>
+                <if test="tel != null and tel != ''">#{tel},</if>
+                <if test="realName != null and realName != ''">#{realName},</if>
+                <if test="userId != null and userId != ''">#{userId},</if>
+                <if test="role != null">#{role},</if>
+                <if test="gridProvinceId != null ">#{gridProvinceId},</if>
+                <if test="gridCityId != null ">#{gridCityId},</if>
+                <if test="gridDistrictId != null ">#{gridDistrictId},</if>
+                <if test="remarks != null and remarks != ''">#{remarks},</if>
+                <if test="sex != null ">#{sex},</if>
+            </trim>
+    </insert>
+
+    <select id="findAll" resultType="org.mgcx.nepm.entity.User">
+        SELECT <include refid="Base_Column_List"/> FROM user
+    </select>
+
+    <!-- deleteUser 函数的 SQL 语句 -->
+    <delete id="deleteUser" parameterType="org.mgcx.nepm.entity.User">
+        DELETE FROM user WHERE user_id = #{userId}
+    </delete>
+
+    <update id="updateUser" parameterType="org.mgcx.nepm.entity.User">
+        UPDATE user
+        <set>
+            <if test="role != null ">role = #{role},</if>
+            <if test="username != null and username != ''">username = #{username},</if>
+            <if test="password != null and password != ''">password = #{password},</if>
+            <if test="realName != null and realName != ''">real_name = #{realName},</if>
+            <if test="birthday != null ">birthday = #{birthday},</if>
+            <if test="sex != null ">sex = #{sex},</if>
+            <if test="tel != null and tel != ''">tel = #{tel},</if>
+            <if test="gridProvinceId != null ">grid_province_id = #{gridProvinceId},</if>
+            <if test="gridCityId != null ">grid_city_id = #{gridCityId},</if>
+            <if test="gridDistrictId != null ">grid_district_id = #{gridDistrictId},</if>
+            <if test="state != null ">state = #{state},</if>
+            <if test="remarks != null and remarks != ''">remarks = #{remarks},</if>
+        </set>
+        WHERE user_id = #{userId}
+    </update>
+
+
+
+    <select id="getAdminData" resultType="org.mgcx.nepm.entity.User">
+        select <include refid="Base_Column_List"/>
+        from user
+        where role = 0
+    </select>
+
+    <resultMap id="Grid" type="org.mgcx.nepm.entity.User" autoMapping="true">
+        <id property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="birthday" column="birthday" jdbcType="VARCHAR"/>
+        <result property="sex" column="sex" jdbcType="INTEGER"/>
+        <result property="tel" column="tel" jdbcType="VARCHAR"/>
+        <result property="state" column="state" jdbcType="INTEGER"/>
+        <!-- 内连接查询 -->
+        <association property="gridProvince" javaType="org.mgcx.nepm.entity.GridProvince">
+            <id property="provinceId" column="province_id" jdbcType="INTEGER"/>
+            <result property="provinceName" column="province_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="gridCity" javaType="org.mgcx.nepm.entity.GridCity">
+            <id property="cityId" column="city_id" jdbcType="INTEGER"/>
+            <result property="cityName" column="city_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="gridDistrict" javaType="org.mgcx.nepm.entity.GridDistrict">
+            <id property="districtId" column="district_id" jdbcType="INTEGER"/>
+            <result property="districtName" column="district_name" jdbcType="VARCHAR"/>
+        </association>
+    </resultMap>
+
+    <select id="getGridManagerByDistrictId" parameterType="java.lang.Integer" resultMap="Grid">
+        SELECT
+            u.*,
+            gp.province_id,
+            gp.province_name,
+            gc.city_id,
+            gc.city_name,
+            gd.district_id,
+            gd.district_name
+        FROM
+            user u
+                INNER JOIN grid_province gp ON u.grid_province_id = gp.province_id
+                INNER JOIN grid_city gc ON u.grid_city_id = gc.city_id
+                INNER JOIN grid_district gd ON u.grid_district_id = gd.district_id
+        WHERE
+            u.grid_district_id = #{value} AND u.role = 1
+    </select>
+    <select id="getGridManagerData" resultMap="Grid">
+        select u.*, gp.province_id, gp.province_name, gc.city_id, gc.city_name, gd.district_id, gd.district_name
+        from user u
+                 INNER JOIN grid_province gp ON u.grid_province_id = gp.province_id
+                 INNER JOIN grid_city gc ON u.grid_city_id = gc.city_id
+                 INNER JOIN grid_district gd ON u.grid_district_id = gd.district_id
+        where  u.role = 1
+    </select>
+
+    <resultMap id="UserSearchResult" type="org.mgcx.nepm.entity.User" autoMapping="true">
+        <!-- 基本字段映射 -->
+        <id property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="password" column="password" jdbcType="VARCHAR"/>
+        <result property="birthday" column="birthday" jdbcType="VARCHAR"/>
+        <result property="sex" column="sex" jdbcType="INTEGER"/>
+        <result property="tel" column="tel" jdbcType="VARCHAR"/>
+        <result property="state" column="state" jdbcType="INTEGER"/>
+        <result property="role" column="role" jdbcType="INTEGER"/>
+        <result property="realName" column="real_name" jdbcType="VARCHAR"/>
+        <result property="remarks" column="remarks" jdbcType="VARCHAR"/>
+        <!-- 关联查询 -->
+        <association property="gridProvince" javaType="org.mgcx.nepm.entity.GridProvince"
+                     select="org.mgcx.nepm.mapper.GridProvinceMapper.getGridProvinceByProvinceId"
+                     column="grid_province_id">
+            <result property="provinceId" column="province_id" jdbcType="INTEGER"/>
+            <result property="provinceName" column="province_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="gridCity" javaType="org.mgcx.nepm.entity.GridCity"
+                     select="org.mgcx.nepm.mapper.GridCityMapper.getGridCityById"
+                     column="grid_city_id">
+            <result property="cityId" column="city_id" jdbcType="INTEGER"/>
+            <result property="cityName" column="city_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="gridDistrict" javaType="org.mgcx.nepm.entity.GridDistrict"
+                     select="org.mgcx.nepm.mapper.GridDistrictMapper.getGridDistrictById"
+                     column="grid_district_id">
+            <result property="districtId" column="district_id" jdbcType="INTEGER"/>
+            <result property="districtName" column="district_name" jdbcType="VARCHAR"/>
+        </association>
+
+    </resultMap>
+
+    <!-- 联合模糊查询 -->
+    <select id="searchUser" parameterType="org.mgcx.nepm.entity.User" resultMap="UserSearchResult">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM user
+        WHERE 1=1
+        <if test="userId != null and userId.trim() != ''">
+            AND useri_d LIKE CONCAT('%', #{userId}, '%')
+        </if>
+        <if test="username != null and username.trim() != ''">
+            AND username LIKE CONCAT('%', #{username}, '%')
+        </if>
+        <if test="realName != null and realName.trim() != ''">
+            AND real_name LIKE CONCAT('%', #{realName}, '%')
+        </if>
+        <if test="tel != null and tel.trim() != ''">
+            AND tel LIKE CONCAT('%', #{tel}, '%')
+        </if>
+        <!-- 继续添加其他字段 -->
+        <if test="role != null">
+            AND role = #{role}
+        </if>
+        <if test="sex != null">
+            AND sex = #{sex}
+        </if>
+        <if test="gridProvinceId != null">
+            AND grid_province_id = #{gridProvinceId}
+        </if>
+        <if test="gridCityId != null">
+            AND grid_city_id = #{gridCityId}
+        </if>
+        <if test="gridDistrictId != null">
+            AND grid_district_id = #{gridDistrictId}
+        </if>
+        <if test="state != null">
+            AND state = #{state}
+        </if>
+    </select>
+    <select id="getUserByTel" resultType="org.mgcx.nepm.entity.User">
+        SELECT <include refid="Base_Column_List"/> FROM user WHERE tel = #{tel}
+    </select>
+
+</mapper>

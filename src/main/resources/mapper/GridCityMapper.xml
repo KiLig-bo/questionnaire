@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mgcx.nepm.mapper.GridCityMapper">
+
+    <resultMap id="BaseResultMap" type="org.mgcx.nepm.entity.GridCity">
+            <id property="cityId" column="city_id" jdbcType="INTEGER"/>
+            <result property="cityName" column="city_name" jdbcType="VARCHAR"/>
+            <result property="provinceId" column="province_id" jdbcType="INTEGER"/>
+            <result property="remarks" column="remarks" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+
+
+
+    <sql id="Base_Column_List">
+        city_id,city_name,province_id,
+        remarks
+    </sql>
+
+    <!-- 根据城市ID获取GridCity -->
+    <select id="getGridCityByCityId" parameterType="org.mgcx.nepm.entity.GridCity" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM grid_city
+        WHERE city_id = #{cityId}
+    </select>
+
+    <!-- 根据城市名称获取GridCity -->
+    <select id="getGridCityByCityName" parameterType="org.mgcx.nepm.entity.GridCity" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM grid_city
+        WHERE city_name = #{cityName}
+    </select>
+
+    <!-- 根据省ID获取GridCity -->
+    <select id="getGridCityByProvinceId" parameterType="org.mgcx.nepm.entity.GridCity" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM grid_city
+        WHERE province_id = #{provinceId}
+    </select>
+
+    <!-- 列出所有GridCity -->
+    <select id="listGridCity" parameterType="org.mgcx.nepm.entity.GridCity" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM grid_city
+        <!-- Additional conditions can be added here if needed -->
+    </select>
+
+    <select id="getGridCityById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM grid_city
+        WHERE city_id = #{cityId}
+    </select>
+
+    <resultMap id="getAllDistrict" type="org.mgcx.nepm.entity.GridCity">
+        <id property="cityId" column="city_id" jdbcType="INTEGER"/>
+        <result property="cityId" column="city_id" jdbcType="INTEGER"/>
+        <result property="cityName" column="city_name" jdbcType="VARCHAR"/>
+        <collection property="children" ofType="org.mgcx.nepm.entity.GridDistrict"
+                    select="org.mgcx.nepm.mapper.GridDistrictMapper.getAllDistrictByCityId"
+                    column="city_id">
+        </collection>
+    </resultMap>
+    <select id="getAllCityByProvinceId" resultMap="getAllDistrict">
+        SELECT <include refid="Base_Column_List"/>
+        FROM grid_city
+        WHERE province_id = #{provinceId}
+    </select>
+
+</mapper>

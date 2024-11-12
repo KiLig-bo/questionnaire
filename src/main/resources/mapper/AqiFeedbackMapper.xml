@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.mgcx.nepm.mapper.AqiFeedbackMapper">
+
+    <resultMap id="BaseResultMap" type="org.mgcx.nepm.entity.AqiFeedback">
+        <id property="afId" column="af_id" jdbcType="INTEGER"/>
+        <result property="spId" column="sp_id" jdbcType="VARCHAR"/>
+        <result property="provinceId" column="province_id" jdbcType="INTEGER"/>
+        <result property="cityId" column="city_id" jdbcType="INTEGER"/>
+        <result property="districtId" column="district_id" jdbcType="INTEGER"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="information" column="information" jdbcType="VARCHAR"/>
+        <result property="estimatedGrade" column="estimated_grade" jdbcType="INTEGER"/>
+        <result property="afTimestamp" column="af_timestamp" jdbcType="TIMESTAMP"/>
+        <result property="gmId" column="gm_id" jdbcType="VARCHAR"/>
+        <result property="assignTimestamp" column="assign_timestamp" jdbcType="TIMESTAMP"/>
+        <result property="state" column="state" jdbcType="INTEGER"/>
+        <result property="remarks" column="remarks" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        af_id
+        ,sp_id,province_id,
+        city_id,district_id, address,information,
+        estimated_grade,af_timestamp,gm_id,
+        assign_timestamp,state,remarks
+    </sql>
+    <resultMap id="getAllAqiFeedbackById" type="org.mgcx.nepm.entity.AqiFeedback">
+        <id property="afId" column="af_id" jdbcType="INTEGER"/>
+        <result property="gmId" column="gm_id" jdbcType="VARCHAR"/>
+        <result property="provinceId" column="province_id" jdbcType="INTEGER"/>
+        <result property="cityId" column="city_id" jdbcType="INTEGER"/>
+        <result property="districtId" column="district_id" jdbcType="INTEGER"/>
+        <result property="estimatedGrade" column="estimated_grade" jdbcType="INTEGER"/>
+        <result property="spId" column="sp_id" jdbcType="VARCHAR"/>
+        <association property="user"
+                     javaType="org.mgcx.nepm.entity.User"
+                     select="org.mgcx.nepm.mapper.UserMapper.getUserByUserId"
+                     column="sp_id">
+            <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        </association>
+        <association property="gridProvince" javaType="org.mgcx.nepm.entity.GridProvince"
+                     select="org.mgcx.nepm.mapper.GridProvinceMapper.getGridProvinceByProvinceId"
+                     column="province_id">
+            <result property="provinceId" column="province_id" jdbcType="INTEGER"/>
+            <result property="provinceName" column="province_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="gridCity" javaType="org.mgcx.nepm.entity.GridCity"
+                     select="org.mgcx.nepm.mapper.GridCityMapper.getGridCityById"
+                     column="city_id">
+            <result property="cityId" column="city_id" jdbcType="INTEGER"/>
+            <result property="cityName" column="city_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="gridDistrict" javaType="org.mgcx.nepm.entity.GridDistrict"
+                     select="org.mgcx.nepm.mapper.GridDistrictMapper.getGridDistrictById"
+                     column="district_id">
+            <result property="districtId" column="district_id" jdbcType="INTEGER"/>
+            <result property="districtName" column="district_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="aqi" javaType="org.mgcx.nepm.entity.Aqi"
+                     select="org.mgcx.nepm.mapper.AqiMapper.getAqiByAqiId"
+                     column="estimated_grade">
+            <result property="level" column="level" jdbcType="VARCHAR"/>
+            <result property="chineseExplain" column="chinese_explain" jdbcType="VARCHAR"/>
+            <result property="aqiExplain" column="aqi_explain" jdbcType="VARCHAR"/>
+            <result property="color" column="color" jdbcType="VARCHAR"/>
+        </association>
+        <association property="gridManager"
+                     javaType="org.mgcx.nepm.entity.User"
+                     select="org.mgcx.nepm.mapper.UserMapper.getUserByUserId"
+                     column="gm_id">
+        </association>
+    </resultMap>
+
+    <!-- SQL statement to get AqiFeedback by ID -->
+    <select id="getAqiFeedbackById" parameterType="org.mgcx.nepm.entity.AqiFeedback" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM aqi_feedback
+        WHERE af_id = #{afId}
+    </select>
+
+    <!-- SQL statement to get AqiFeedback by spId -->
+    <select id="getAqiFeedbackBySpId" parameterType="org.mgcx.nepm.entity.AqiFeedback" resultMap="aqi2other">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM aqi_feedback
+        WHERE sp_id = #{spId}
+    </select>
+
+    <!-- SQL statement to get AqiFeedback by gmId -->
+    <select id="getAqiFeedbackByGmId" parameterType="org.mgcx.nepm.entity.AqiFeedback" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM aqi_feedback
+        WHERE gm_id = #{gmId}
+    </select>
+
+    <!-- SQL statement to get AqiFeedback by state -->
+    <select id="getAqiFeedbackByState" parameterType="org.mgcx.nepm.entity.AqiFeedback" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM aqi_feedback
+        WHERE state = #{state}
+    </select>
+    <!-- 修改返回数据类型 -->
+    <resultMap id="aqi2other" type="org.mgcx.nepm.entity.AqiFeedback">
+        <association property="user"
+                     javaType="org.mgcx.nepm.entity.User"
+                     select="org.mgcx.nepm.mapper.UserMapper.getUserByUserId"
+                     column="sp_id">
+            <result property="username" column="username" jdbcType="VARCHAR"/>
+        </association>
+        <association property="gridProvince" javaType="org.mgcx.nepm.entity.GridProvince"
+                     select="org.mgcx.nepm.mapper.GridProvinceMapper.getGridProvinceByProvinceId"
+                     column="province_id">
+            <id property="provinceId" column="province_id" jdbcType="INTEGER"/>
+            <result property="provinceId" column="province_id" jdbcType="INTEGER"/>
+            <result property="provinceName" column="province_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="gridCity" javaType="org.mgcx.nepm.entity.GridCity"
+                     select="org.mgcx.nepm.mapper.GridCityMapper.getGridCityById"
+                     column="city_id">
+            <result property="cityId" column="city_id" jdbcType="INTEGER"/>
+            <result property="cityName" column="city_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="gridDistrict" javaType="org.mgcx.nepm.entity.GridDistrict"
+                     select="org.mgcx.nepm.mapper.GridDistrictMapper.getGridDistrictById"
+                     column="district_id">
+            <result property="districtId" column="district_id" jdbcType="INTEGER"/>
+            <result property="districtName" column="district_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="aqi" javaType="org.mgcx.nepm.entity.Aqi"
+                     select="org.mgcx.nepm.mapper.AqiMapper.getAqiByAqiId"
+                     column="estimated_grade">
+
+        </association>
+
+    </resultMap>
+
+
+    <!-- 查询所有的AqiFeedback -->
+    <select id="sellectAllAqiFeedBack" resultMap="aqi2other">
+        select *
+        from aqi_feedback
+    </select>
+
+    <select id="selectAqiFeedbackById" parameterType="java.lang.Integer" resultMap="getAllAqiFeedbackById">
+        select
+        <include refid="Base_Column_List"/>
+        from aqi_feedback
+        where af_id = #{afId}
+    </select>
+
+
+    <!-- SQL statement to modify AqiFeedback -->
+    <update id="modifyAqiFeedback" parameterType="org.mgcx.nepm.entity.AqiFeedback">
+        UPDATE aqi_feedback
+        SET
+        <if test="spId != null">sp_id = #{spId},</if>
+        <if test="provinceId != null">province_id = #{provinceId},</if>
+        <if test="cityId != null">city_id = #{cityId},</if>
+        <if test="districtId != null">district_id = #{districtId},</if>
+        <if test="address != null">address = #{address},</if>
+        <if test="information != null">information = #{information},</if>
+        <if test="estimatedGrade != null">estimated_grade = #{estimatedGrade},</if>
+        <if test="afTimestamp != null">af_timestamp = #{afTimestamp},</if>
+        <if test="gmId != null">gm_id = #{gmId},</if>
+        <if test="assignTimestamp != null">assign_timestamp = #{assignTimestamp},</if>
+        <if test="state != null">state = #{state},</if>
+        <if test="remarks != null">remarks = #{remarks}</if>
+        WHERE af_id = #{afId}
+    </update>
+
+    <insert id="saveAqiFeedbackId" parameterType="org.mgcx.nepm.entity.AqiFeedback" useGeneratedKeys="true"
+            keyProperty="afId">
+        INSERT INTO aqi_feedback (sp_id, province_id, city_id, district_id, address, information, estimated_grade,
+                                  af_timestamp, gm_id, assign_timestamp, state, remarks)
+        VALUES (#{spId}, #{provinceId}, #{cityId}, #{districtId}, #{address}, #{information}, #{estimatedGrade},
+                #{afTimestamp}, #{gmId}, #{assignTimestamp}, #{state}, #{remarks})
+    </insert>
+
+    <resultMap id="searchAqiFeedBackResult" type="org.mgcx.nepm.entity.AqiFeedback">
+        <id property="afId" column="af_id" jdbcType="INTEGER"/>
+        <result property="gmId" column="gm_id" jdbcType="VARCHAR"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="provinceId" column="province_id" jdbcType="INTEGER"/>
+        <result property="cityId" column="city_id" jdbcType="INTEGER"/>
+        <result property="districtId" column="district_id" jdbcType="INTEGER"/>
+        <result property="estimatedGrade" column="estimated_grade" jdbcType="INTEGER"/>
+        <result property="spId" column="sp_id" jdbcType="VARCHAR"/>
+        <result property="afTimestamp" column="af_timestamp" jdbcType="TIMESTAMP"/>
+        <result property="assignTimestamp" column="assign_timestamp" jdbcType="TIMESTAMP"/>
+        <result property="information" column="information" jdbcType="VARCHAR"/>
+        <result property="state" column="state" jdbcType="INTEGER"/>
+        <result property="remarks" column="remarks" jdbcType="VARCHAR"/>
+
+        <association property="user"
+                     javaType="org.mgcx.nepm.entity.User"
+                     select="org.mgcx.nepm.mapper.UserMapper.getUserByUserId"
+                     column="sp_id">
+            <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+            <result property="username" column="username" jdbcType="VARCHAR"/>
+            <result property="realName" column="real_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="gridProvince" javaType="org.mgcx.nepm.entity.GridProvince"
+                     select="org.mgcx.nepm.mapper.GridProvinceMapper.getGridProvinceByProvinceId"
+                     column="province_id">
+            <result property="provinceId" column="province_id" jdbcType="INTEGER"/>
+            <result property="provinceName" column="province_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="gridCity" javaType="org.mgcx.nepm.entity.GridCity"
+                     select="org.mgcx.nepm.mapper.GridCityMapper.getGridCityById"
+                     column="city_id">
+            <result property="cityId" column="city_id" jdbcType="INTEGER"/>
+            <result property="cityName" column="city_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="gridDistrict" javaType="org.mgcx.nepm.entity.GridDistrict"
+                     select="org.mgcx.nepm.mapper.GridDistrictMapper.getGridDistrictById"
+                     column="district_id">
+            <result property="districtId" column="district_id" jdbcType="INTEGER"/>
+            <result property="districtName" column="district_name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="aqi" javaType="org.mgcx.nepm.entity.Aqi"
+                     select="org.mgcx.nepm.mapper.AqiMapper.getAqiByAqiId"
+                     column="estimated_grade">
+            <result property="aqiId" column="aqi_id" jdbcType="INTEGER"/>
+            <result property="level" column="level" jdbcType="VARCHAR"/>
+            <result property="color" column="color" jdbcType="VARCHAR"/>
+            <result property="chineseExplain" column="chinese_explain" jdbcType="VARCHAR"/>
+        </association>
+
+    </resultMap>
+
+    <!-- 联合模糊查询 -->
+    <select id="searchAqiFeedBack" parameterType="org.mgcx.nepm.entity.AqiFeedback" resultMap="searchAqiFeedBackResult">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM aqi_feedback
+        <where>
+            <if test="afId != null">
+                af_id = #{afId}
+            </if>
+            <if test="spId != null and spId.trim() != ''">
+                AND sp_id LIKE CONCAT('%', #{spId}, '%')
+            </if>
+            <if test="provinceId != null">
+                AND province_id = #{provinceId}
+            </if>
+            <if test="cityId != null">
+                AND city_id = #{cityId}
+            </if>
+            <if test="districtId != null">
+                AND district_id = #{districtId}
+            </if>
+            <if test="address != null and address.trim() != ''">
+                AND address LIKE CONCAT('%', #{address}, '%')
+            </if>
+            <if test="information != null and information.trim() != ''">
+                AND information LIKE CONCAT('%', #{information}, '%')
+            </if>
+            <if test="estimatedGrade != null">
+                AND estimated_grade = #{estimatedGrade}
+            </if>
+            <!-- 注意：对于 TIMESTAMP 字段，通常不需要模糊查询 -->
+            <if test="afTimestamp != null">
+                AND af_timestamp = #{afTimestamp}
+            </if>
+            <if test="gmId != null and gmId.trim() != ''">
+                AND gm_id LIKE CONCAT('%', #{gmId}, '%')
+            </if>
+            <if test="assignTimestamp != null">
+                AND assign_timestamp = #{assignTimestamp}
+            </if>
+            <if test="state != null">
+                AND state = #{state}
+            </if>
+        </where>
+    </select>
+</mapper>
