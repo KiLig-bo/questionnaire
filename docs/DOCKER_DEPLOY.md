@@ -1,39 +1,42 @@
-# docker compose 部署文档
-> 注意：以下操作默认都是在项目的根目录，如果你没有，请先进入：`cd questionnaire` 
+# Docker Compose Deployment Guide
 
-## 一键启动项目
-> 首先确保你本地安装了docker engine和docker compose，并且**系统能够联网**。
+> **Note**: All following operations assume you are in the project’s root directory. If not, navigate to it first:
+   ```shell
+   cd questionnaire
+   ```
 
-首先使用Maven构建项目
-```shell
-./mvnw clean package -Dmaven.test.skip=true
-```
+## Start the Project in One Step
+> First, ensure that Docker Engine and Docker Compose are installed and that your system has internet access.
 
-使用docker compose启动项目和依赖服务
-```shell
-docker-compose up --build
-```
+1. Build the project using Maven:
+   ```shell
+   ./mvnw clean package -Dmaven.test.skip=true
+   ```
 
-如果你本地没有mysql:8.0.22,elasticsearch:7.6.2的镜像，docker会先pull镜像，可能会有些慢！
-另外在elasticsearch容器启动时会访问github下载把并安装ik分词插件。
-mysql容器启动时，会执行一些初始化sql用于创建表结构和导入初始化数据。<br>
+2. Start the project and its dependencies using Docker Compose:
+   ```shell
+   docker-compose up --build
+   ```
 
-如果没有任何问题，启动完成之后执行命令`docker ps`你将看到三个运行的容器，分别为
-- questionnaire_web：我们的项目questionnaire
-- questionnaire_db：mysql数据库
-- questionnaire_es：elasticsearch
+   - If the `mysql:8.0.22` or `elasticsearch:7.6.2` images are not present locally, Docker will pull them, which may take some time.
+   - During the startup, the Elasticsearch container will access GitHub to download and install the IK analysis plugin.
+   - The MySQL container will execute initial SQL scripts to set up table structures and import initial data.
 
+3. Once completed, run `docker ps` to confirm the following three containers are running:
+   - `questionnaire_web`: the main questionnaire application
+   - `questionnaire_db`: the MySQL database
+   - `questionnaire_es`: Elasticsearch
 
+## Sync Data to Elasticsearch
+Wait until Elasticsearch is fully started before executing the following steps.  
+With port 9200 exposed, you can run the commands below to interact with Elasticsearch directly from your local machine.
 
-## 同步数据到elasticsearch
-等 elasticsearch完全启动后，就可以执行下面的操作了。<br>
-在启动elasticsearch时，已经暴露了端口9200,所以你可以直接在本地执行下面的命令操作elasticsearch
-### 创建`template`索引
+### Create the `template` Index
 ```shell
 curl -XPUT localhost:9200/template?pretty
 ```
 
-### 设置字段_mapping
+### Set Field Mappings
 ```shell
 curl -XPOST localhost:9200/template/_mapping?pretty -H 'content-type:application/json' -d'
 {
@@ -76,85 +79,22 @@ curl -XPOST localhost:9200/template/_mapping?pretty -H 'content-type:application
 }'
 ```
 
-### 查看设置的_mapping
+### Verify Mappings
 ```shell
 curl -XGET localhost:9200/template/_mapping?pretty
-{
-  "template" : {
-    "mappings" : {
-      "properties" : {
-        "authorId" : {
-          "type" : "long"
-        },
-        "authorName" : {
-          "type" : "text"
-        },
-        "createDate" : {
-          "type" : "date",
-          "format" : "yyyy/MM/dd HH:mm:ss"
-        },
-        "id" : {
-          "type" : "long"
-        },
-        "name" : {
-          "type" : "text",
-          "analyzer" : "ik_max_word",
-          "search_analyzer" : "ik_smart"
-        },
-        "publishDate" : {
-          "type" : "date",
-          "format" : "yyyy/MM/dd HH:mm:ss"
-        },
-        "questionCount" : {
-          "type" : "integer"
-        },
-        "status" : {
-          "type" : "integer"
-        },
-        "questions" : {
-          "type" : "nested",
-          "properties" : {
-            "id" : {
-              "type" : "long"
-            },
-            "inputPlaceholder" : {
-              "type" : "text"
-            },
-            "questionNum" : {
-              "type" : "integer"
-            },
-            "questionOrder" : {
-              "type" : "integer"
-            },
-            "questionTitle" : {
-              "type" : "text",
-              "analyzer" : "ik_max_word",
-              "search_analyzer" : "ik_smart"
-            },
-            "templateId" : {
-              "type" : "long"
-            }
-          }
-        },
-        "typeId" : {
-          "type" : "integer"
-        }
-      }
-    }
-  }
-}
 ```
 
-### 索引数据到es，data.json位于docker/inites/目录
+### Index Data into Elasticsearch
+Data located in `data.json` can be indexed with:
 ```shell
 curl -XPOST localhost:9200/template/_bulk?pretty \
--H 'content-type:application/json' \ 
+-H 'content-type:application/json' \
 --data-binary "@./docker/inites/data.json"
 ```
 
-### 测试查询
+### Test a Search Query
 ```shell
- curl -XPOST localhost:9200/template/_search?pretty -H 'content-type:application/json' -d'
+curl -XPOST localhost:9200/template/_search?pretty -H 'content-type:application/json' -d'
 {
     "query" : { "match" : { "name" : "大学生" }},
     "highlight" : {
@@ -169,15 +109,16 @@ curl -XPOST localhost:9200/template/_bulk?pretty \
 ```
 
 ## FAQ
-### 1. 为什么启动这么慢？<br>
- - 如果你本地没有mysql:8.0.22,elasticsearch:7.6.2的镜像，docker会先pull镜像，可能会有些慢！建议使用国内`docker hub`。
- - 另外在elasticsearch容器启动时会访问github下载把并安装ik分词插件。
- - mysql容器启动时，会执行一些初始化sql用于创建表结构和导入初始化数据。
-    
-### 2. 为什么会启动失败？<br>
- - 确保你的系统能够联网，因为pull镜像，下载ik插件都需要联网。
- - 执行docker-compose 所处的路径是否正确，请在项目的根目录执行。
-     
-### 3. 为什么Elasticsearch启动失败？
- - 在容器启动时会从github下载并安装ik分词插件，有可能是下载ik插件失败，导致es启动失败，确保你能够访问github。
-   如果你不能访问，请先下载到本地，启动es后再手动安装。
+
+### 1. Why is startup so slow?
+- If the `mysql:8.0.22` or `elasticsearch:7.6.2` images are not present, Docker will need to pull them first. Using a local mirror or Docker Hub in your region can help speed this up.
+- Additionally, the Elasticsearch container accesses GitHub to download and install the IK analysis plugin.
+- The MySQL container also takes some time to initialize tables and import initial data.
+
+### 2. Why did startup fail?
+- Ensure your system is connected to the internet since pulling images and downloading plugins requires connectivity.
+- Confirm you are running `docker-compose` from the project’s root directory.
+
+### 3. Why did Elasticsearch fail to start?
+- Elasticsearch accesses GitHub to download and install the IK analysis plugin. A failure to access GitHub could cause Elasticsearch to fail.  
+  If access to GitHub is restricted, download the plugin locally and install it manually after starting Elasticsearch.
